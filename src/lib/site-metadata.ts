@@ -33,6 +33,23 @@ function absoluteSiteUrl(path: string) {
   return new URL(path, siteUrl).href
 }
 
+const defaultOgImageAlt = `${siteName} | ${siteTagline}`
+
+function createDefaultSocialImages() {
+  return {
+    openGraph: [
+      {
+        url: absoluteSiteUrl("/opengraph-image"),
+        width: 1200,
+        height: 630,
+        alt: defaultOgImageAlt,
+        type: "image/png",
+      },
+    ],
+    twitter: [absoluteSiteUrl("/twitter-image")],
+  }
+}
+
 export function createSiteMetadata(): Metadata {
   const siteUrl = getSiteUrl()
 
@@ -80,6 +97,7 @@ export function createSiteMetadata(): Metadata {
 
 export function createWrapMetadata(): Metadata {
   const description = "Enter a GitHub username to generate your activity recap."
+  const images = createDefaultSocialImages()
 
   return {
     title: "Generate your wrap",
@@ -88,10 +106,13 @@ export function createWrapMetadata(): Metadata {
       title: "Generate your wrap",
       description,
       url: "/wrap",
+      images: images.openGraph,
     },
     twitter: {
+      card: "summary_large_image",
       title: "Generate your wrap",
       description,
+      images: images.twitter,
     },
     alternates: getSiteUrl() ? { canonical: "/wrap" } : undefined,
   }
@@ -100,6 +121,7 @@ export function createWrapMetadata(): Metadata {
 export function createPrivacyMetadata(): Metadata {
   const description =
     "Learn how GitWrap collects, uses, and stores data when you generate a GitHub activity recap."
+  const images = createDefaultSocialImages()
 
   return {
     title: "Privacy Policy",
@@ -108,10 +130,13 @@ export function createPrivacyMetadata(): Metadata {
       title: "Privacy Policy",
       description,
       url: "/privacy",
+      images: images.openGraph,
     },
     twitter: {
+      card: "summary_large_image",
       title: "Privacy Policy",
       description,
+      images: images.twitter,
     },
     alternates: getSiteUrl() ? { canonical: "/privacy" } : undefined,
   }
@@ -143,6 +168,7 @@ export function createSharedWrapMetadata(
           width: 1200,
           height: 630,
           alt: imageAlt,
+          type: "image/png",
         },
       ],
     },

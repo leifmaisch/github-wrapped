@@ -45,11 +45,21 @@ function formatNumber(value: number) {
 
 function ShareBar({ shareId }: { shareId: string }) {
   const [copied, setCopied] = useState(false)
+  const [shareUrl, setShareUrl] = useState<string | null>(null)
   const sharePath = `/r/${shareId}`
 
+  useEffect(() => {
+    const base =
+      process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
+      window.location.origin
+    setShareUrl(`${base}${sharePath}`)
+  }, [sharePath])
+
   async function copyLink() {
-    const shareUrl = `${window.location.origin}${sharePath}`
-    await navigator.clipboard.writeText(shareUrl)
+    const url =
+      shareUrl ??
+      `${window.location.origin}${sharePath}`
+    await navigator.clipboard.writeText(url)
     setCopied(true)
     window.setTimeout(() => setCopied(false), 2000)
   }
@@ -58,7 +68,7 @@ function ShareBar({ shareId }: { shareId: string }) {
     <div className="flex flex-col gap-3 rounded-squircle-lg border border-border/60 bg-card/50 p-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="min-w-0">
         <p className="text-label">Share link</p>
-        <p className="truncate text-body text-foreground">{sharePath}</p>
+        <p className="break-all text-body text-foreground">{shareUrl ?? sharePath}</p>
       </div>
       <Button className="min-h-11 w-full sm:w-auto" size="lg" variant="outline" onClick={copyLink}>
         <CopyIcon weight={iconWeight} className="size-4" />
