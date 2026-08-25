@@ -16,6 +16,8 @@ import {
 } from "@phosphor-icons/react"
 
 import { CountryFlag } from "@/components/country-flag"
+import { DeveloperTitle } from "@/components/wrapped/developer-title"
+import { TopRepoCard } from "@/components/wrapped/top-repo-card"
 import { iconWeight } from "@/components/shared"
 import { SiteNavbar } from "@/components/site-navbar"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -38,12 +40,10 @@ function formatNumber(value: number) {
 
 function ShareBar({ shareId }: { shareId: string }) {
   const [copied, setCopied] = useState(false)
-  const shareUrl =
-    typeof window !== "undefined"
-      ? `${window.location.origin}/r/${shareId}`
-      : `/r/${shareId}`
+  const sharePath = `/r/${shareId}`
 
   async function copyLink() {
+    const shareUrl = `${window.location.origin}${sharePath}`
     await navigator.clipboard.writeText(shareUrl)
     setCopied(true)
     window.setTimeout(() => setCopied(false), 2000)
@@ -53,7 +53,7 @@ function ShareBar({ shareId }: { shareId: string }) {
     <div className="flex flex-col gap-3 rounded-squircle-lg border border-border/60 bg-card/50 p-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="min-w-0">
         <p className="text-label">Share link</p>
-        <p className="truncate text-body text-foreground">{shareUrl}</p>
+        <p className="truncate text-body text-foreground">{sharePath}</p>
       </div>
       <Button variant="outline" onClick={copyLink}>
         <CopyIcon weight={iconWeight} className="size-4" />
@@ -99,9 +99,13 @@ export function WrappedResults({ result }: { result: WrappedResult }) {
                   >
                     <ArrowSquareOutIcon weight={iconWeight} className="size-4" />
                   </a>
-                  <Badge variant="secondary">{developerTitle}</Badge>
                 </div>
-                <p className="text-description">
+                <DeveloperTitle
+                  title={developerTitle}
+                  percentile={stats.contributionPercentile ?? 1}
+                  className="mt-1"
+                />
+                <p className="mt-1 text-description">
                   @{profile.username} · {year} wrap
                 </p>
               </div>
@@ -289,20 +293,11 @@ export function WrappedResults({ result }: { result: WrappedResult }) {
               </div>
               <p className="text-stat-value">{formatNumber(stats.followers)}</p>
             </div>
-            <div className="rounded-squircle-md border border-border/60 bg-background/40 p-4">
-              <div className="mb-2 flex items-center gap-2 text-muted-foreground">
-                <UsersIcon weight={iconWeight} className="size-4" />
-                <span className="text-label">Following</span>
-              </div>
-              <p className="text-stat-value">{formatNumber(stats.following ?? 0)}</p>
-            </div>
           </div>
-        </div>
 
-        <div className="flex flex-col gap-6">
-          <div className="surface-panel flex flex-col gap-5 p-6">
+          <div className="flex flex-col gap-4 border-t border-border/60 pt-5">
             <div>
-              <h2 className="text-heading-lg">Collaboration</h2>
+              <h3 className="text-heading-lg">Collaboration</h3>
               <p className="text-caption">Work beyond your own repos</p>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -328,31 +323,9 @@ export function WrappedResults({ result }: { result: WrappedResult }) {
               </div>
             </div>
           </div>
-
-          {stats.topRepo ? (
-            <div className="surface-panel flex flex-col gap-5 p-6">
-              <div>
-                <h2 className="text-heading-lg">Top repository</h2>
-                <p className="text-caption">Most starred public repo</p>
-              </div>
-              <div className="flex flex-col gap-3">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant="secondary">{stats.topRepo.fullName}</Badge>
-                  {stats.topRepo.language ? (
-                    <Badge variant="outline">{stats.topRepo.language}</Badge>
-                  ) : null}
-                </div>
-                {stats.topRepo.description ? (
-                  <p className="text-body text-muted-foreground">{stats.topRepo.description}</p>
-                ) : null}
-                <div className="flex gap-4 text-caption">
-                  <span>{formatNumber(stats.topRepo.stars)} stars</span>
-                  <span>{formatNumber(stats.topRepo.forks)} forks</span>
-                </div>
-              </div>
-            </div>
-          ) : null}
         </div>
+
+        {stats.topRepo ? <TopRepoCard repo={stats.topRepo} /> : null}
       </div>
 
       {result.shareId ? <ShareBar shareId={result.shareId} /> : null}

@@ -119,8 +119,19 @@ export async function createWrappedOgImage(result: WrappedResult) {
               >
                 {truncateText(displayName, 28)}
               </span>
-              <span style={{ fontSize: 22, color: ogColors.muted }}>
-                @{result.username} · {stats.developerTitle}
+              <span
+                style={{
+                  marginTop: 4,
+                  fontSize: 24,
+                  fontWeight: 600,
+                  color: ogColors.primary,
+                  letterSpacing: "-0.01em",
+                }}
+              >
+                {stats.developerTitle}
+              </span>
+              <span style={{ marginTop: 4, fontSize: 22, color: ogColors.muted }}>
+                @{result.username} · {result.year} wrap
               </span>
             </div>
           </div>

@@ -21,13 +21,13 @@ export function StatCard({
       data-slot="stat-card"
       style={squircle}
       className={cn(
-        "relative w-full rounded-squircle-card border border-black/[0.04] bg-muted/50 p-2 dark:border-inset-dark dark:bg-card",
+        "relative flex h-full w-full flex-col rounded-squircle-card border border-black/[0.04] bg-muted/50 p-2 dark:border-inset-dark dark:bg-card",
         className
       )}
     >
       <div
         style={squircle}
-        className="relative w-full overflow-hidden rounded-squircle-inner border border-black/[0.06] bg-neutral-950 p-4 dark:border-neutral-500/15 sm:p-5"
+        className="relative flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-squircle-inner border border-black/[0.06] bg-neutral-950 p-4 dark:border-neutral-500/15 sm:p-5"
       >
         <div
           aria-hidden

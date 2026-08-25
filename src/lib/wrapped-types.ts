@@ -40,9 +40,12 @@ export type MonthlyActivity = {
 export type TopRepo = {
   name: string
   fullName: string
+  owner?: string
+  url?: string
   stars: number
   forks: number
   language: string | null
+  languageColor?: string | null
   description: string | null
 }
 

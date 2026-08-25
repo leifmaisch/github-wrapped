@@ -376,13 +376,17 @@ function findTopRepo(repos: GitHubRepo[]): TopRepo | null {
   if (repos.length === 0) return null
 
   const top = [...repos].sort((a, b) => b.stargazers_count - a.stargazers_count)[0]
+  const owner = top.full_name.split("/")[0] ?? ""
 
   return {
     name: top.name,
     fullName: top.full_name,
+    owner,
+    url: `https://github.com/${top.full_name}`,
     stars: top.stargazers_count,
     forks: top.forks_count,
     language: top.language,
+    languageColor: top.language ? (LANGUAGE_COLORS[top.language] ?? "#a3a3a3") : null,
     description: top.description,
   }
 }
