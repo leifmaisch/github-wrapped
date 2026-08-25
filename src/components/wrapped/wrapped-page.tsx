@@ -152,11 +152,9 @@ export function WrappedResults({ result }: { result: WrappedResult }) {
             <div>
               <h2 className="text-heading-lg">Monthly activity</h2>
               <p className="text-caption">
-                {stats.busiestWeek
-                  ? `Peak week: ${stats.busiestWeek.label}`
-                  : stats.busiestMonth
-                    ? `Peak month: ${stats.busiestMonth}`
-                    : "Contributions by month"}
+                {stats.busiestMonth
+                  ? `Peak month: ${stats.busiestMonth}`
+                  : "Contributions by month"}
               </p>
             </div>
           </div>

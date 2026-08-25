@@ -307,18 +307,8 @@ function computeStreaks(days: ContributionDay[]) {
   return { longestStreak, activeDays }
 }
 
-function computeMonthlyActivity(days: ContributionDay[], year: number): MonthlyActivity[] {
-  const months = new Map<string, number>()
-  const formatter = new Intl.DateTimeFormat("en-US", { month: "short", timeZone: "UTC" })
-
-  for (const day of days) {
-    const date = new Date(`${day.date}T00:00:00Z`)
-    if (date.getUTCFullYear() !== year) continue
-    const key = formatter.format(date)
-    months.set(key, (months.get(key) ?? 0) + day.contributionCount)
-  }
-
-  const order = [
+function getVisibleMonths(year: number) {
+  const monthOrder = [
     "Jan",
     "Feb",
     "Mar",
@@ -331,9 +321,30 @@ function computeMonthlyActivity(days: ContributionDay[], year: number): MonthlyA
     "Oct",
     "Nov",
     "Dec",
-  ]
+  ] as const
 
-  return order.map((month) => ({
+  const now = new Date()
+  const currentYear = now.getUTCFullYear()
+  const currentMonthIndex = now.getUTCMonth()
+
+  if (year > currentYear) return []
+  if (year < currentYear) return [...monthOrder]
+
+  return monthOrder.slice(0, currentMonthIndex + 1)
+}
+
+function computeMonthlyActivity(days: ContributionDay[], year: number): MonthlyActivity[] {
+  const months = new Map<string, number>()
+  const formatter = new Intl.DateTimeFormat("en-US", { month: "short", timeZone: "UTC" })
+
+  for (const day of days) {
+    const date = new Date(`${day.date}T00:00:00Z`)
+    if (date.getUTCFullYear() !== year) continue
+    const key = formatter.format(date)
+    months.set(key, (months.get(key) ?? 0) + day.contributionCount)
+  }
+
+  return getVisibleMonths(year).map((month) => ({
     month,
     contributions: months.get(month) ?? 0,
   }))
@@ -419,10 +430,8 @@ export async function generateWrapped(username: string): Promise<WrappedResult> 
   const streaks = calendar ? computeStreaks(days) : { longestStreak: 0, activeDays: 0 }
   const monthlyActivity = calendar
     ? computeMonthlyActivity(days, year)
-    : Array.from({ length: 12 }, (_, index) => ({
-        month: new Intl.DateTimeFormat("en-US", { month: "short" }).format(
-          new Date(year, index, 1)
-        ),
+    : getVisibleMonths(year).map((month) => ({
+        month,
         contributions: 0,
       }))
   const totalContributions = calendar?.totalContributions ?? 0
