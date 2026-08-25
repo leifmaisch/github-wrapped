@@ -60,7 +60,7 @@ function ShareBar({ shareId }: { shareId: string }) {
         <p className="text-label">Share link</p>
         <p className="truncate text-body text-foreground">{sharePath}</p>
       </div>
-      <Button className="w-full sm:w-auto" variant="outline" onClick={copyLink}>
+      <Button className="min-h-11 w-full sm:w-auto" size="lg" variant="outline" onClick={copyLink}>
         <CopyIcon weight={iconWeight} className="size-4" />
         {copied ? "Copied" : "Copy link"}
       </Button>
@@ -100,7 +100,7 @@ export function WrappedResults({ result }: { result: WrappedResult }) {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={`Open @${profile.username} on GitHub`}
-                    className="inline-flex shrink-0 items-center justify-center rounded-squircle-sm p-1 text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+                    className="inline-flex size-11 shrink-0 items-center justify-center rounded-squircle-sm text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
                   >
                     <ArrowSquareOutIcon weight={iconWeight} className="size-4" />
                   </a>
@@ -419,7 +419,7 @@ export function SharedWrappedPage({ result }: { result: WrappedResult }) {
       <main id="main-content" className="mx-auto w-full max-w-5xl px-4 py-6 sm:py-10 md:py-14">
         <WrappedResults result={result} />
         <div className="mt-8 flex justify-center sm:mt-10">
-          <Button variant="outline" render={<Link href="/wrap" />}>
+          <Button className="min-h-11" size="lg" variant="outline" render={<Link href="/wrap" />}>
             Generate yours
           </Button>
         </div>

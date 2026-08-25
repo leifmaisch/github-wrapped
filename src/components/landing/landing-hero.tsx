@@ -34,11 +34,16 @@ export function LandingHero() {
               shareable card with a liquid metal border.
             </HeroDescription>
             <HeroActions className="w-full justify-stretch sm:w-auto sm:justify-start [&>*]:w-full sm:[&>*]:w-auto">
-              <Button size="lg" render={<Link href="/wrap" />}>
+              <Button className="min-h-11" size="lg" render={<Link href="/wrap" />}>
                 Get your wrap
                 <ArrowRightIcon weight={iconWeight} className="size-4" />
               </Button>
-              <Button size="lg" variant="outline" render={<Link href="#features" />}>
+              <Button
+                className="min-h-11"
+                size="lg"
+                variant="outline"
+                render={<Link href="#features" />}
+              >
                 See what you get
               </Button>
             </HeroActions>

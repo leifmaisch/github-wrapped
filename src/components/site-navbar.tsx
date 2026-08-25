@@ -21,15 +21,29 @@ export function SiteNavbar() {
       <NavbarFrame>
         <NavbarBrand href="/" logo={<SiteLogo />} name={siteName} />
         <NavbarActions className="ml-auto">
-          <Button render={<Link href="/wrap" />}>Get your wrap</Button>
+          <nav aria-label="Main">
+            <Button
+              className="min-h-11"
+              size="lg"
+              render={<Link href="/wrap" />}
+            >
+              Get your wrap
+            </Button>
+          </nav>
         </NavbarActions>
         <NavbarMenuButton />
       </NavbarFrame>
       <NavbarMobileMenu>
         <NavbarMobileActions>
-          <Button className="w-full" render={<Link href="/wrap" />}>
-            Get your wrap
-          </Button>
+          <nav aria-label="Main">
+            <Button
+              className="min-h-11 w-full"
+              size="lg"
+              render={<Link href="/wrap" />}
+            >
+              Get your wrap
+            </Button>
+          </nav>
         </NavbarMobileActions>
       </NavbarMobileMenu>
     </Navbar>

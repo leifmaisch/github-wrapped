@@ -5,10 +5,10 @@ import { formatPercentileRank } from "@/lib/wrapped-insights"
 
 export const siteName = "GitWrap"
 
-export const siteTagline = "Your year on GitHub"
+export const siteTagline = "Your GitHub year in review"
 
 export const siteDescription =
-  "Generate a shareable recap of your GitHub activity. Commits, languages, streaks, and top repos in one card."
+  "Generate a shareable recap of your GitHub activity. See commits, languages, coding streaks, and top repos in one beautiful card."
 
 export const siteKeywords = [
   "github wrapped",
@@ -50,6 +50,7 @@ export function createSiteMetadata(): Metadata {
     alternates: siteUrl ? { canonical: "/" } : undefined,
     icons: {
       icon: "/favicon.ico",
+      apple: [{ url: "/apple-icon", sizes: "180x180", type: "image/png" }],
     },
     openGraph: {
       title: `${siteName} | ${siteTagline}`,
@@ -93,6 +94,26 @@ export function createWrapMetadata(): Metadata {
       description,
     },
     alternates: getSiteUrl() ? { canonical: "/wrap" } : undefined,
+  }
+}
+
+export function createPrivacyMetadata(): Metadata {
+  const description =
+    "Learn how GitWrap collects, uses, and stores data when you generate a GitHub activity recap."
+
+  return {
+    title: "Privacy Policy",
+    description,
+    openGraph: {
+      title: "Privacy Policy",
+      description,
+      url: "/privacy",
+    },
+    twitter: {
+      title: "Privacy Policy",
+      description,
+    },
+    alternates: getSiteUrl() ? { canonical: "/privacy" } : undefined,
   }
 }
 

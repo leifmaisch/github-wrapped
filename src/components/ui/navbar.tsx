@@ -95,7 +95,7 @@ function NavbarBrand({
 }: NavbarBrandProps) {
   return (
     <div data-slot="navbar-brand" className={cn("min-w-0 shrink-0", className)} {...props}>
-      <Link href={href} className="flex min-w-0 items-center gap-2.5 py-1.5">
+      <Link href={href} className="flex min-h-11 min-w-0 items-center gap-2.5 py-2">
         {logo}
         {name ? <span className="text-title truncate">{name}</span> : null}
       </Link>
@@ -182,7 +182,7 @@ function NavbarMenuButton({
       onClick={() => setOpen(!open)}
       style={squircle}
       className={cn(
-        "ml-auto flex size-9 items-center justify-center rounded-squircle-md border border-border bg-muted/40 text-foreground md:hidden",
+        "ml-auto flex size-11 items-center justify-center rounded-squircle-md border border-border bg-muted/40 text-foreground md:hidden",
         className
       )}
       {...props}

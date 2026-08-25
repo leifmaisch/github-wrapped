@@ -22,6 +22,7 @@ import {
   FooterBar,
   FooterBrand,
   FooterCopyright,
+  FooterLegal,
   FooterPanel,
 } from "@/components/ui/footer"
 import { SiteLogo } from "@/components/site-logo"
@@ -79,7 +80,11 @@ export function LandingPage() {
             Paste a username and get a shareable wrap in seconds.
           </CtaDescription>
           <CtaActions>
-            <Button size="lg" render={<Link href="/wrap" />}>
+            <Button
+              className="min-h-11"
+              size="lg"
+              render={<Link href="/wrap" />}
+            >
               <SparkleIcon className="size-4" weight="duotone" />
               Generate wrap
             </Button>
@@ -93,6 +98,9 @@ export function LandingPage() {
             <FooterBrand href="/" logo={<SiteLogo />} name={siteName}>
               Your GitHub year in review.
             </FooterBrand>
+            <FooterLegal
+              links={[{ href: "/privacy", label: "Privacy" }]}
+            />
             <FooterCopyright name={siteName} />
           </FooterBar>
         </FooterPanel>
