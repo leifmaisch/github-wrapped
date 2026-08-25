@@ -18,7 +18,7 @@ import {
 import { CountryFlag } from "@/components/country-flag"
 import { DeveloperTitle } from "@/components/wrapped/developer-title"
 import { TopRepoCard } from "@/components/wrapped/top-repo-card"
-import { WrapStory, wrapStoryStorageKey } from "@/components/wrapped/wrap-story"
+import { WrapStory, wrapStoryPendingKey } from "@/components/wrapped/wrap-story"
 import { iconWeight } from "@/components/shared"
 import { SiteNavbar } from "@/components/site-navbar"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -345,6 +345,11 @@ export function WrapPage() {
         throw new Error(payload.error ?? "Unable to generate wrap")
       }
 
+      if (!payload.shareId) {
+        throw new Error("Unable to generate wrap")
+      }
+
+      sessionStorage.setItem(wrapStoryPendingKey(payload.shareId), "1")
       router.push(`/r/${payload.shareId}`)
     } catch (submitError) {
       setError(
@@ -403,13 +408,13 @@ export function SharedWrappedPage({ result }: { result: WrappedResult }) {
       return
     }
 
-    const dismissed = sessionStorage.getItem(wrapStoryStorageKey(shareId))
-    setPhase(dismissed ? "results" : "story")
+    const pending = sessionStorage.getItem(wrapStoryPendingKey(shareId))
+    setPhase(pending ? "story" : "results")
   }, [shareId])
 
   const completeStory = useCallback(() => {
     if (shareId) {
-      sessionStorage.setItem(wrapStoryStorageKey(shareId), "1")
+      sessionStorage.removeItem(wrapStoryPendingKey(shareId))
     }
     setPhase("results")
   }, [shareId])

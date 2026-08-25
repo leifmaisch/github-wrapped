@@ -537,8 +537,8 @@ function StoryVisualBlock({
   return null
 }
 
-export function wrapStoryStorageKey(shareId: string) {
-  return `gitwrap-story-dismissed:${shareId}`
+export function wrapStoryPendingKey(shareId: string) {
+  return `gitwrap-story-pending:${shareId}`
 }
 
 export function WrapStory({
