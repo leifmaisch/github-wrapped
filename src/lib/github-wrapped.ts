@@ -8,6 +8,19 @@ import type {
   WrappedResult,
   WrappedStats,
 } from "@/lib/wrapped-types"
+import type { ContributionDay } from "@/lib/wrapped-types"
+import {
+  computeAvgPerActiveDay,
+  computeBestDay,
+  computeBusiestWeek,
+  computeContributionPercentile,
+  computeDeveloperTitle,
+} from "@/lib/wrapped-insights"
+import {
+  fetchCollaborationStats,
+  fetchStarGrowth,
+  formatMemberSince,
+} from "@/lib/github-social"
 
 const LANGUAGE_COLORS: Record<string, string> = {
   TypeScript: "#3178c6",
@@ -46,6 +59,9 @@ type GitHubUser = {
   created_at: string
   public_repos: number
   followers: number
+  following: number
+  location: string | null
+  company: string | null
   type: string
 }
 
@@ -58,11 +74,6 @@ type GitHubRepo = {
   description: string | null
   pushed_at: string
   size: number
-}
-
-type ContributionDay = {
-  date: string
-  contributionCount: number
 }
 
 type ContributionCalendar = {
@@ -152,8 +163,18 @@ async function fetchContributionCalendar(
   year: number
 ): Promise<ContributionCalendar | null> {
   const token = process.env.GITHUB_TOKEN
-  if (!token) return null
+  if (token) {
+    const fromGraphql = await fetchContributionCalendarGraphql(username, year)
+    if (fromGraphql) return fromGraphql
+  }
 
+  return fetchContributionCalendarFromProfile(username, year)
+}
+
+async function fetchContributionCalendarGraphql(
+  username: string,
+  year: number
+): Promise<ContributionCalendar | null> {
   const from = `${year}-01-01T00:00:00Z`
   const to = `${year}-12-31T23:59:59Z`
 
@@ -203,6 +224,67 @@ async function fetchContributionCalendar(
   return payload.data?.user?.contributionsCollection?.contributionCalendar ?? null
 }
 
+function parseContributionTooltip(text: string) {
+  if (text.startsWith("No contributions")) return 0
+  const match = text.match(/^([\d,]+)\s+contributions?\s+on/i)
+  if (!match) return 0
+  return Number.parseInt(match[1].replace(/,/g, ""), 10)
+}
+
+async function fetchContributionCalendarFromProfile(
+  username: string,
+  year: number
+): Promise<ContributionCalendar | null> {
+  const today = new Date()
+  const isCurrentYear = year === today.getUTCFullYear()
+  const to = isCurrentYear
+    ? today.toISOString().slice(0, 10)
+    : `${year}-12-31`
+  const url = `https://github.com/users/${encodeURIComponent(username)}/contributions?from=${year}-01-01&to=${to}`
+
+  const response = await fetch(url, {
+    headers: {
+      "User-Agent": "GitWrap/1.0",
+      Accept: "text/html",
+    },
+    next: { revalidate: 3600 },
+  })
+
+  if (!response.ok) return null
+
+  const html = await response.text()
+  const tooltipRegex =
+    /for="(contribution-day-component-[^"]+)"[^>]*>([^<]+)</g
+  const dayRegex =
+    /data-date="(\d{4}-\d{2}-\d{2})"[^>]*id="(contribution-day-component-[^"]+)"/g
+
+  const tooltips = new Map<string, string>()
+  for (const match of html.matchAll(tooltipRegex)) {
+    tooltips.set(match[1], match[2].trim())
+  }
+
+  const days: ContributionDay[] = []
+  for (const match of html.matchAll(dayRegex)) {
+    const date = match[1]
+    const count = parseContributionTooltip(tooltips.get(match[2]) ?? "")
+    days.push({ date, contributionCount: count })
+  }
+
+  if (days.length === 0) return null
+
+  const totalMatch = html.match(
+    /id="js-contribution-activity-description"[\s\S]*?>\s*([\d,]+)\s*contributions/i
+  )
+  const totalContributions = totalMatch
+    ? Number.parseInt(totalMatch[1].replace(/,/g, ""), 10)
+    : days.reduce((sum, day) => sum + day.contributionCount, 0)
+
+  return {
+    totalContributions,
+    weeks: [{ contributionDays: days }],
+  }
+}
+
 function flattenDays(calendar: ContributionCalendar) {
   return calendar.weeks.flatMap((week) => week.contributionDays)
 }
@@ -225,12 +307,13 @@ function computeStreaks(days: ContributionDay[]) {
   return { longestStreak, activeDays }
 }
 
-function computeMonthlyActivity(days: ContributionDay[]): MonthlyActivity[] {
+function computeMonthlyActivity(days: ContributionDay[], year: number): MonthlyActivity[] {
   const months = new Map<string, number>()
-  const formatter = new Intl.DateTimeFormat("en-US", { month: "short" })
+  const formatter = new Intl.DateTimeFormat("en-US", { month: "short", timeZone: "UTC" })
 
   for (const day of days) {
     const date = new Date(`${day.date}T00:00:00Z`)
+    if (date.getUTCFullYear() !== year) continue
     const key = formatter.format(date)
     months.set(key, (months.get(key) ?? 0) + day.contributionCount)
   }
@@ -293,38 +376,6 @@ function findTopRepo(repos: GitHubRepo[]): TopRepo | null {
   }
 }
 
-function estimateContributionsFromRepos(repos: GitHubRepo[], year: number) {
-  const yearStart = new Date(`${year}-01-01T00:00:00Z`).getTime()
-  const yearEnd = new Date(`${year}-12-31T23:59:59Z`).getTime()
-  let pushes = 0
-
-  for (const repo of repos) {
-    const pushed = new Date(repo.pushed_at).getTime()
-    if (pushed >= yearStart && pushed <= yearEnd) {
-      pushes += 1
-    }
-  }
-
-  const estimated = Math.max(pushes * 12, repos.length * 8)
-  const monthly = Array.from({ length: 12 }, (_, index) => {
-    const month = new Intl.DateTimeFormat("en-US", { month: "short" }).format(
-      new Date(year, index, 1)
-    )
-    const weight = 1 + Math.sin((index / 12) * Math.PI * 2) * 0.2
-    return {
-      month,
-      contributions: Math.round((estimated / 12) * weight),
-    }
-  })
-
-  return {
-    totalContributions: estimated,
-    monthlyActivity: monthly,
-    longestStreak: Math.min(14, Math.max(3, Math.round(estimated / 40))),
-    activeDays: Math.min(365, Math.round(estimated / 3)),
-  }
-}
-
 async function fetchEventCounts(username: string, year: number) {
   const yearStart = new Date(`${year}-01-01T00:00:00Z`).getTime()
   let pullRequests = 0
@@ -356,17 +407,32 @@ async function fetchEventCounts(username: string, year: number) {
 export async function generateWrapped(username: string): Promise<WrappedResult> {
   const year = getWrappedYear()
   const user = await fetchUser(username)
-  const [repos, calendar, eventCounts] = await Promise.all([
+  const [repos, calendar, eventCounts, collaboration] = await Promise.all([
     fetchRepos(user.login),
     fetchContributionCalendar(user.login, year),
     fetchEventCounts(user.login, year),
+    fetchCollaborationStats(user.login, year),
   ])
+  const starGrowth = await fetchStarGrowth(repos, year)
 
-  const fallback = estimateContributionsFromRepos(repos, year)
   const days = calendar ? flattenDays(calendar) : []
-  const streaks = calendar ? computeStreaks(days) : fallback
-  const monthlyActivity = calendar ? computeMonthlyActivity(days) : fallback.monthlyActivity
-  const totalContributions = calendar ? calendar.totalContributions : fallback.totalContributions
+  const streaks = calendar ? computeStreaks(days) : { longestStreak: 0, activeDays: 0 }
+  const monthlyActivity = calendar
+    ? computeMonthlyActivity(days, year)
+    : Array.from({ length: 12 }, (_, index) => ({
+        month: new Intl.DateTimeFormat("en-US", { month: "short" }).format(
+          new Date(year, index, 1)
+        ),
+        contributions: 0,
+      }))
+  const totalContributions = calendar?.totalContributions ?? 0
+  const avgPerActiveDay = computeAvgPerActiveDay(
+    totalContributions,
+    streaks.activeDays
+  )
+  const bestDay = calendar ? computeBestDay(days, year) : null
+  const busiestWeek = calendar ? computeBusiestWeek(days, year) : null
+  const contributionPercentile = computeContributionPercentile(totalContributions)
 
   const busiestMonth =
     monthlyActivity.length > 0
@@ -375,11 +441,6 @@ export async function generateWrapped(username: string): Promise<WrappedResult> 
       : null
 
   const totalStars = repos.reduce((sum, repo) => sum + repo.stargazers_count, 0)
-  const joinedAt = new Date(user.created_at)
-  const accountAgeYears = Math.max(
-    0,
-    Math.floor((Date.now() - joinedAt.getTime()) / (365.25 * 24 * 60 * 60 * 1000))
-  )
 
   const profile: WrappedProfile = {
     username: user.login,
@@ -388,23 +449,43 @@ export async function generateWrapped(username: string): Promise<WrappedResult> 
     bio: user.bio,
     profileUrl: user.html_url,
     joinedAt: user.created_at,
+    memberSince: formatMemberSince(user.created_at),
+    location: user.location,
+    company: user.company,
   }
+
+  const topLanguages = computeTopLanguages(repos)
 
   const stats: WrappedStats = {
     totalContributions,
     longestStreak: streaks.longestStreak,
     activeDays: streaks.activeDays,
+    avgPerActiveDay,
+    bestDay,
+    busiestWeek,
+    contributionPercentile,
+    developerTitle: computeDeveloperTitle({
+      totalContributions,
+      longestStreak: streaks.longestStreak,
+      activeDays: streaks.activeDays,
+      pullRequests: eventCounts.pullRequests,
+      reviews: eventCounts.reviews,
+      avgPerActiveDay,
+      topLanguages,
+    }),
     pullRequests: eventCounts.pullRequests,
     issues: eventCounts.issues,
     reviews: eventCounts.reviews,
     publicRepos: user.public_repos,
     totalStars,
+    starGrowth,
+    collaboration,
     followers: user.followers,
-    topLanguages: computeTopLanguages(repos),
+    following: user.following,
+    topLanguages,
     monthlyActivity,
     topRepo: findTopRepo(repos),
     busiestMonth,
-    accountAgeYears,
   }
 
   return {

@@ -1,3 +1,30 @@
+export type BestDay = {
+  date: string
+  label: string
+  contributions: number
+}
+
+export type BusiestWeek = {
+  weekStart: string
+  label: string
+  contributions: number
+}
+
+export type ContributionDay = {
+  date: string
+  contributionCount: number
+}
+
+export type CollaborationStats = {
+  externalRepos: number
+  coAuthoredPullRequests: number
+}
+
+export type StarGrowthStats = {
+  gainedThisYear: number
+  scannedRepos: number
+}
+
 export type LanguageStat = {
   name: string
   bytes: number
@@ -23,17 +50,24 @@ export type WrappedStats = {
   totalContributions: number
   longestStreak: number
   activeDays: number
+  avgPerActiveDay: number
+  bestDay: BestDay | null
+  busiestWeek: BusiestWeek | null
+  developerTitle: string
+  contributionPercentile: number
   pullRequests: number
   issues: number
   reviews: number
   publicRepos: number
   totalStars: number
+  starGrowth: StarGrowthStats
+  collaboration: CollaborationStats
   followers: number
+  following: number
   topLanguages: LanguageStat[]
   monthlyActivity: MonthlyActivity[]
   topRepo: TopRepo | null
   busiestMonth: string | null
-  accountAgeYears: number
 }
 
 export type WrappedProfile = {
@@ -43,6 +77,9 @@ export type WrappedProfile = {
   bio: string | null
   profileUrl: string
   joinedAt: string
+  memberSince: string
+  location: string | null
+  company: string | null
 }
 
 export type WrappedResult = {

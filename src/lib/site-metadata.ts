@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 
 import type { WrappedResult } from "@/lib/wrapped-types"
+import { formatPercentileRank } from "@/lib/wrapped-insights"
 
 export const siteName = "GitWrap"
 
@@ -101,7 +102,7 @@ export function createSharedWrapMetadata(
 ): Metadata {
   const siteUrl = getSiteUrl()
   const title = `@${result.username} · ${result.year} wrap`
-  const description = `${result.stats.totalContributions.toLocaleString()} contributions · ${result.stats.longestStreak}-day streak · top language ${result.stats.topLanguages[0]?.name ?? "—"}`
+  const description = `${result.stats.developerTitle} · ${formatPercentileRank(result.stats.contributionPercentile)} · ${result.stats.totalContributions.toLocaleString()} contributions`
   const imageAlt = `@${result.username} GitHub ${result.year} wrap`
   const sharePath = `/r/${shareId}`
   const ogImagePath = `/r/${shareId}/opengraph-image`

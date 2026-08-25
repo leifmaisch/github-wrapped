@@ -8,6 +8,7 @@ import {
   truncateText,
 } from "@/lib/og-shared"
 import type { WrappedResult } from "@/lib/wrapped-types"
+import { formatPercentileRank } from "@/lib/wrapped-insights"
 
 function StatBlock({ label, value }: { label: string; value: string }) {
   return (
@@ -119,7 +120,7 @@ export async function createWrappedOgImage(result: WrappedResult) {
                 {truncateText(displayName, 28)}
               </span>
               <span style={{ fontSize: 22, color: ogColors.muted }}>
-                @{result.username} · {result.year} wrap
+                @{result.username} · {stats.developerTitle}
               </span>
             </div>
           </div>
@@ -143,6 +144,20 @@ export async function createWrappedOgImage(result: WrappedResult) {
             <span style={{ fontSize: 18, color: ogColors.muted, marginTop: 6 }}>
               contributions
             </span>
+            {stats.totalContributions > 0 ? (
+              <span
+                style={{
+                  marginTop: 10,
+                  fontSize: 18,
+                  color: ogColors.primary,
+                  padding: "6px 14px",
+                  borderRadius: 999,
+                  border: `1px solid ${ogColors.border}`,
+                }}
+              >
+                {formatPercentileRank(stats.contributionPercentile)}
+              </span>
+            ) : null}
           </div>
         </div>
 
@@ -154,10 +169,19 @@ export async function createWrappedOgImage(result: WrappedResult) {
             marginBottom: 24,
           }}
         >
-          <StatBlock label="Longest streak" value={`${stats.longestStreak}d`} />
-          <StatBlock label="Active days" value={String(stats.activeDays)} />
-          <StatBlock label="Stars earned" value={stats.totalStars.toLocaleString()} />
-          <StatBlock label="Public repos" value={String(stats.publicRepos)} />
+          <StatBlock label="Avg per day" value={String(stats.avgPerActiveDay)} />
+          <StatBlock
+            label="Best day"
+            value={stats.bestDay ? String(stats.bestDay.contributions) : "—"}
+          />
+          <StatBlock
+            label="Busiest week"
+            value={
+              stats.busiestWeek
+                ? stats.busiestWeek.contributions.toLocaleString()
+                : "—"
+            }
+          />
         </div>
 
         <div

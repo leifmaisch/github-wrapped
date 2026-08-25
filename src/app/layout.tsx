@@ -7,7 +7,7 @@ import "./globals.css"
 export const metadata = createSiteMetadata()
 
 export const viewport: Viewport = {
-  themeColor: "#252525",
+  themeColor: "#101411",
 }
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

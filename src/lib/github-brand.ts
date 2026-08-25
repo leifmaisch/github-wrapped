@@ -1,0 +1,15 @@
+export const githubBrand = {
+  green: "#0FBF3E",
+  green1: "#BFFFD1",
+  green2: "#8CF2A6",
+  green3: "#5FED83",
+  green4: "#0FBF3E",
+  green5: "#08872B",
+  green6: "#0A241B",
+  gray1: "#F2F5F3",
+  gray2: "#E4EBE6",
+  gray3: "#B6BFB8",
+  gray4: "#909692",
+  gray5: "#232925",
+  gray6: "#101411",
+} as const
