@@ -24,7 +24,7 @@ function normalizeTopRepo(repo: TopRepo): TopRepo {
 export function TopRepoCard({ repo }: { repo: TopRepo }) {
   const topRepo = normalizeTopRepo(repo)
   return (
-    <div className="surface-panel flex flex-col gap-5 p-6">
+    <div className="surface-panel flex flex-col gap-4 sm:gap-5">
       <div>
         <h2 className="text-heading-lg">Top repository</h2>
         <p className="text-caption">Most starred public repo</p>

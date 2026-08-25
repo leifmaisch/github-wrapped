@@ -27,7 +27,7 @@ export function StatCard({
     >
       <div
         style={squircle}
-        className="relative flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-squircle-inner border border-black/[0.06] bg-neutral-950 p-4 dark:border-neutral-500/15 sm:p-5"
+        className="relative flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-squircle-inner border border-black/[0.06] bg-neutral-950 p-3 dark:border-neutral-500/15 sm:p-4 md:p-5"
       >
         <div
           aria-hidden

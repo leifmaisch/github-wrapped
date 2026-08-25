@@ -176,9 +176,17 @@
   }
   @media (max-width: 639px) {
     :root {
+      --type-heading-xl: 1.375rem;
+      --type-heading-lg: 1.125rem;
+      --type-display: 1.375rem;
+      --type-display-lg: 1.625rem;
       --type-body: 1rem;
       --type-label: 0.8125rem;
       --type-caption: 0.8125rem;
+      --radius-squircle-card: 24px;
+      --radius-squircle-inner: 18px;
+      --radius-squircle-xl: 22px;
+      --radius-squircle-lg: 16px;
     }
   }
 }
@@ -297,7 +305,7 @@
 
 @layer utilities {
   .surface-panel {
-    @apply rounded-squircle-xl border-inset-dark rounded-squircle-xl border bg-card;
+    @apply rounded-squircle-xl border-inset-dark rounded-squircle-xl border bg-card p-4 sm:p-6;
   }
   .dark .surface-panel {
     @apply border-inset-dark;

@@ -8,7 +8,7 @@ function Section({
     <section
       data-slot="section"
       className={cn(
-        "mx-auto w-full max-w-6xl scroll-mt-24 px-4 py-12 sm:px-6 md:py-20 lg:py-28",
+        "mx-auto w-full max-w-6xl scroll-mt-24 px-4 py-10 sm:px-6 sm:py-12 md:py-20 lg:py-28",
         className
       )}
       {...props}

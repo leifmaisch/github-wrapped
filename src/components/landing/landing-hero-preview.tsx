@@ -7,9 +7,9 @@ import { MetalHeroCard } from "@/components/wrapped/metal-hero-card"
 import { squircle } from "@/lib/squircle"
 
 const preview = {
-  name: "Alex Kim",
-  username: "alexkim",
-  avatarUrl: "https://github.com/octocat.png",
+  name: "Linus Torvalds",
+  username: "torvalds",
+  avatarUrl: "https://github.com/torvalds.png",
   developerTitle: "Power Contributor",
   percentile: 97,
   contributions: 2644,
@@ -31,18 +31,18 @@ export function LandingHeroPreview() {
   const year = new Date().getFullYear()
 
   return (
-    <div className="flex h-full w-full items-center justify-center p-4 sm:p-6 md:p-8">
-      <MetalHeroCard percentile={preview.percentile} className="max-w-md">
+    <div className="flex h-full w-full items-center justify-center p-3 sm:p-6 md:p-8">
+      <MetalHeroCard percentile={preview.percentile} className="w-full max-w-md min-w-0">
         <div
           style={squircle}
-          className="w-full overflow-hidden rounded-squircle-lg"
+          className="w-full min-w-0 overflow-hidden rounded-squircle-lg"
         >
-          <div className="flex flex-col gap-5 p-5 sm:p-6">
-            <div className="flex items-start justify-between gap-4">
+          <div className="flex flex-col gap-4 p-4 sm:gap-5 sm:p-5 md:p-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
               <div className="flex min-w-0 items-center gap-3">
-                <Avatar className="size-12 ring-2 ring-primary/30">
+                <Avatar className="size-11 shrink-0 ring-2 ring-primary/30 sm:size-12">
                   <AvatarImage src={preview.avatarUrl} alt={preview.name} />
-                  <AvatarFallback>AK</AvatarFallback>
+                  <AvatarFallback>LT</AvatarFallback>
                 </Avatar>
                 <div className="min-w-0">
                   <p className="truncate font-heading text-heading">{preview.name}</p>
@@ -56,12 +56,14 @@ export function LandingHeroPreview() {
                   </p>
                 </div>
               </div>
-              <div className="shrink-0 text-right">
-                <p className="text-stat-value text-primary">
-                  {formatNumber(preview.contributions)}
-                </p>
-                <p className="text-caption">contributions</p>
-                <Badge className="mt-1.5" variant="outline">
+              <div className="flex items-center justify-between gap-3 rounded-squircle-sm border border-border/60 bg-background/30 px-3 py-2 sm:block sm:shrink-0 sm:border-0 sm:bg-transparent sm:p-0 sm:text-right">
+                <div>
+                  <p className="text-stat-value text-primary">
+                    {formatNumber(preview.contributions)}
+                  </p>
+                  <p className="text-caption">contributions</p>
+                </div>
+                <Badge className="shrink-0 sm:mt-1.5" variant="outline">
                   {preview.percentileLabel}
                 </Badge>
               </div>
@@ -72,15 +74,15 @@ export function LandingHeroPreview() {
                 <div
                   key={stat.label}
                   style={squircle}
-                  className="rounded-squircle-sm border border-border/60 bg-background/40 px-3 py-2.5"
+                  className="min-w-0 rounded-squircle-sm border border-border/60 bg-background/40 px-2.5 py-2 sm:px-3 sm:py-2.5"
                 >
-                  <p className="text-label">{stat.label}</p>
+                  <p className="truncate text-label">{stat.label}</p>
                   <p className="text-stat-value mt-1 text-sm">{stat.value}</p>
                 </div>
               ))}
             </div>
 
-            <div className="flex h-16 items-end gap-1">
+            <div className="flex h-14 items-end gap-0.5 sm:h-16 sm:gap-1">
               {preview.chart.map((height, index) => (
                 <div
                   key={index}

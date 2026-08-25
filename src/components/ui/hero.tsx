@@ -9,7 +9,7 @@ function Hero({ className, ...props }: HeroProps) {
   return (
     <Section
       data-slot="hero"
-      className={cn("py-12 sm:py-16 md:py-24", className)}
+      className={cn("py-8 sm:py-12 md:py-16 lg:py-24", className)}
       {...props}
     />
   )
@@ -46,7 +46,7 @@ function HeroIntro({
     <div
       data-slot="hero-intro"
       className={cn(
-        "flex flex-col items-center gap-4 px-4 py-10 text-center sm:gap-5 sm:px-10 sm:py-14",
+        "flex flex-col items-center gap-4 px-4 py-8 text-center sm:gap-5 sm:px-10 sm:py-14",
         className
       )}
       {...props}
@@ -110,7 +110,7 @@ function HeroActions({
     <div
       data-slot="hero-actions"
       className={cn(
-        "flex flex-wrap items-center justify-center gap-3",
+        "flex flex-wrap items-center justify-center gap-2 sm:gap-3",
         className
       )}
       {...props}
@@ -157,8 +157,8 @@ function HeroShowcase({
     <div
       data-slot="hero-showcase"
       style={squircle}
-      className={cn(
-        "relative mx-1 mb-1 min-h-[200px] overflow-hidden rounded-squircle-inner border border-border bg-card sm:min-h-[280px] md:min-h-[300px]",
+        className={cn(
+        "relative flex min-h-[180px] overflow-hidden rounded-squircle-inner border border-border bg-card sm:min-h-[240px] md:min-h-[300px]",
         surfaceDepth("md"),
         className
       )}

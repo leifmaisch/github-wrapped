@@ -28,7 +28,6 @@ import { SiteLogo } from "@/components/site-logo"
 import { TopGlow } from "@/components/ui/top-glow"
 import {
   Section,
-  SectionDescription,
   SectionHeader,
   SectionTitle,
 } from "@/components/ui/section"
@@ -46,9 +45,6 @@ export function LandingPage() {
         <Section id="features">
           <SectionHeader>
             <SectionTitle>What you get</SectionTitle>
-            <SectionDescription>
-              A clean recap card with the stats that matter, ready to share.
-            </SectionDescription>
           </SectionHeader>
           <div className="grid gap-4 sm:grid-cols-3">
             {[
@@ -68,7 +64,7 @@ export function LandingPage() {
                 description: "A dedicated link with rich preview images for social posts.",
               },
             ].map((item) => (
-              <div key={item.title} className="surface-panel flex flex-col gap-3 p-6">
+              <div key={item.title} className="surface-panel flex flex-col gap-3">
                 <item.icon className="size-8 text-primary" weight="duotone" />
                 <h3 className="text-heading-lg">{item.title}</h3>
                 <p className="text-description">{item.description}</p>

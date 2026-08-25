@@ -22,7 +22,7 @@ export function DeveloperTitle({
   return (
     <p
       className={cn(
-        "font-heading text-heading tracking-tight",
+        "font-heading text-heading tracking-tight break-words",
         titleStyles[tier],
         className
       )}

@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { ArrowRightIcon, ChartBarIcon, GitBranchIcon, ShareNetworkIcon } from "@phosphor-icons/react"
+import { ArrowRightIcon } from "@phosphor-icons/react"
 
 import { iconWeight } from "@/components/shared"
 import { LandingHeroPreview } from "@/components/landing/landing-hero-preview"
@@ -9,8 +9,6 @@ import { Button } from "@/components/ui/button"
 import {
   Hero,
   HeroActions,
-  HeroChip,
-  HeroChips,
   HeroDescription,
   HeroFrame,
   HeroIntro,
@@ -19,12 +17,6 @@ import {
   HeroTitle,
 } from "@/components/ui/hero"
 
-const highlights = [
-  { icon: ChartBarIcon, label: "Activity and streaks" },
-  { icon: GitBranchIcon, label: "Languages and repos" },
-  { icon: ShareNetworkIcon, label: "Shareable link" },
-]
-
 export function LandingHero() {
   const year = new Date().getFullYear()
 
@@ -32,7 +24,7 @@ export function LandingHero() {
     <Hero>
       <HeroFrame className="p-0">
         <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
-          <HeroIntro className="items-start px-6 py-10 text-left sm:px-10 sm:py-12 lg:py-14">
+          <HeroIntro className="items-start px-4 py-8 text-left sm:px-10 sm:py-12 lg:py-14">
             <HeroLabel>{year} GitHub wrap</HeroLabel>
             <HeroTitle className="max-w-xl text-left">
               Your year on GitHub, wrapped
@@ -41,7 +33,7 @@ export function LandingHero() {
               Contributions, streaks, languages, and collaboration stats in one
               shareable card with a liquid metal border.
             </HeroDescription>
-            <HeroActions className="justify-start">
+            <HeroActions className="w-full justify-stretch sm:w-auto sm:justify-start [&>*]:w-full sm:[&>*]:w-auto">
               <Button size="lg" render={<Link href="/wrap" />}>
                 Get your wrap
                 <ArrowRightIcon weight={iconWeight} className="size-4" />
@@ -50,17 +42,9 @@ export function LandingHero() {
                 See what you get
               </Button>
             </HeroActions>
-            <HeroChips className="justify-start">
-              {highlights.map((item) => (
-                <HeroChip key={item.label} className="inline-flex items-center gap-1.5">
-                  <item.icon weight={iconWeight} className="size-3.5 text-primary" />
-                  {item.label}
-                </HeroChip>
-              ))}
-            </HeroChips>
           </HeroIntro>
 
-          <HeroShowcase className="mx-0 mb-0 min-h-[320px] rounded-none border-0 border-t border-border lg:min-h-full lg:border-t-0 lg:border-l">
+          <HeroShowcase className="mx-0 mb-0 min-h-[280px] rounded-none border-0 border-t border-border sm:min-h-[320px] lg:min-h-full lg:border-t-0 lg:border-l">
             <LandingHeroPreview />
           </HeroShowcase>
         </div>

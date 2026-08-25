@@ -22,7 +22,7 @@ export function MetalHeroCard({
       borderRadius={32}
       ringCssPx={2}
       disableGlow
-      className={cn("block w-full bg-card", className)}
+      className={cn("block w-full min-w-0 bg-card", className)}
     >
       {children}
     </MetalFx>
