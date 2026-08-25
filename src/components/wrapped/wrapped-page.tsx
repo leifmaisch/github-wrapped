@@ -22,13 +22,14 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { GlowCard } from "@/components/ui/glow-card"
+import { MetalHeroCard } from "@/components/wrapped/metal-hero-card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Progress, ProgressLabel } from "@/components/ui/progress"
 import { StatCard } from "@/components/ui/stat-card"
 import { TopGlow } from "@/components/ui/top-glow"
 import { formatPercentileRank } from "@/lib/wrapped-insights"
+import { squircle } from "@/lib/squircle"
 import type { WrappedResult } from "@/lib/wrapped-types"
 
 function formatNumber(value: number) {
@@ -72,7 +73,11 @@ export function WrappedResults({ result }: { result: WrappedResult }) {
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-8">
-      <GlowCard className="overflow-hidden">
+      <MetalHeroCard percentile={stats.contributionPercentile ?? 1}>
+        <div
+          style={squircle}
+          className="w-full overflow-hidden rounded-squircle-lg"
+        >
         <div className="flex flex-col gap-6 p-6 sm:p-8">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-4">
@@ -144,7 +149,8 @@ export function WrappedResults({ result }: { result: WrappedResult }) {
             <StatCard label="Pull requests" value={String(stats.pullRequests)} />
           </div>
         </div>
-      </GlowCard>
+        </div>
+      </MetalHeroCard>
 
       <div className="grid gap-6 lg:grid-cols-5">
         <div className="surface-panel flex flex-col gap-5 p-6 lg:col-span-3">
