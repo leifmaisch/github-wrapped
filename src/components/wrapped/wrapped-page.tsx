@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import {
   ArrowRightIcon,
   ArrowSquareOutIcon,
@@ -18,6 +18,7 @@ import {
 import { CountryFlag } from "@/components/country-flag"
 import { DeveloperTitle } from "@/components/wrapped/developer-title"
 import { TopRepoCard } from "@/components/wrapped/top-repo-card"
+import { WrapStory, wrapStoryStorageKey } from "@/components/wrapped/wrap-story"
 import { iconWeight } from "@/components/shared"
 import { SiteNavbar } from "@/components/site-navbar"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -25,6 +26,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { MetalHeroCard } from "@/components/wrapped/metal-hero-card"
+import {
+  getPeakMonthEntry,
+  MonthlyActivityChart,
+} from "@/components/wrapped/monthly-activity-chart"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Progress, ProgressLabel } from "@/components/ui/progress"
@@ -66,7 +71,7 @@ function ShareBar({ shareId }: { shareId: string }) {
 export function WrappedResults({ result }: { result: WrappedResult }) {
   const { profile, stats, year } = result
   const chartData = stats.monthlyActivity
-  const maxMonth = Math.max(...chartData.map((item) => item.contributions), 1)
+  const peakMonthEntry = getPeakMonthEntry(chartData)
   const developerTitle = stats.developerTitle ?? "Developer"
   const percentileRank = formatPercentileRank(stats.contributionPercentile ?? 1)
   const avgPerActiveDay = stats.avgPerActiveDay ?? 0
@@ -165,50 +170,18 @@ export function WrappedResults({ result }: { result: WrappedResult }) {
             <div>
               <h2 className="text-heading-lg">Monthly activity</h2>
               <p className="text-caption">
-                {stats.busiestMonth
-                  ? `Peak month: ${stats.busiestMonth}`
+                {peakMonthEntry
+                  ? `Peak month: ${peakMonthEntry.month} · ${peakMonthEntry.contributions.toLocaleString()} contributions`
                   : "Contributions by month"}
               </p>
             </div>
           </div>
           <div className="-mx-1 overflow-x-auto px-1 sm:mx-0 sm:overflow-visible sm:px-0">
-            <div className="flex h-44 min-w-[20rem] gap-1 sm:h-56 sm:min-w-0 sm:gap-2">
-            {chartData.map((item) => {
-              const height =
-                item.contributions === 0
-                  ? 0
-                  : Math.max(12, (item.contributions / maxMonth) * 100)
-
-              return (
-                <div
-                  key={item.month}
-                  className="group flex min-w-0 flex-1 flex-col"
-                >
-                  <div className="relative flex flex-1 items-end">
-                    {item.contributions > 0 ? (
-                      <span className="pointer-events-none absolute -top-1 left-1/2 z-10 hidden -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-squircle-sm border border-border bg-card px-2 py-1 text-caption text-foreground shadow-sm sm:group-hover:block">
-                        {item.contributions.toLocaleString()} contributions
-                      </span>
-                    ) : null}
-                    <div
-                      className="flex w-full flex-col items-center justify-end"
-                      style={{ height: `${height}%` }}
-                    >
-                      {item.contributions > 0 ? (
-                        <span className="mb-1 hidden text-caption font-medium text-muted-foreground tabular-nums transition-colors group-hover:text-foreground sm:block">
-                          {item.contributions.toLocaleString()}
-                        </span>
-                      ) : null}
-                      <div className="w-full flex-1 rounded-t-sm bg-primary/80 transition-colors group-hover:bg-primary" />
-                    </div>
-                  </div>
-                  <span className="mt-2 shrink-0 text-center text-[10px] sm:text-caption">
-                    {item.month}
-                  </span>
-                </div>
-              )
-            })}
-            </div>
+            <MonthlyActivityChart
+              data={chartData}
+              highlight={peakMonthEntry?.month ?? stats.busiestMonth ?? undefined}
+              variant="results"
+            />
           </div>
         </div>
 
@@ -411,6 +384,34 @@ export function WrapPage() {
 }
 
 export function SharedWrappedPage({ result }: { result: WrappedResult }) {
+  const shareId = result.shareId ?? ""
+  const [phase, setPhase] = useState<"loading" | "story" | "results">("loading")
+
+  useEffect(() => {
+    if (!shareId) {
+      setPhase("results")
+      return
+    }
+
+    const dismissed = sessionStorage.getItem(wrapStoryStorageKey(shareId))
+    setPhase(dismissed ? "results" : "story")
+  }, [shareId])
+
+  const completeStory = useCallback(() => {
+    if (shareId) {
+      sessionStorage.setItem(wrapStoryStorageKey(shareId), "1")
+    }
+    setPhase("results")
+  }, [shareId])
+
+  if (phase === "loading") {
+    return <div className="min-h-screen bg-background" aria-hidden />
+  }
+
+  if (phase === "story") {
+    return <WrapStory result={result} onComplete={completeStory} />
+  }
+
   return (
     <div className="relative isolate min-h-full">
       <TopGlow />
