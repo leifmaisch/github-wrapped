@@ -1,4 +1,4 @@
-import type { ComponentType } from "react"
+import { createElement, type ComponentType, type ReactNode } from "react"
 import * as NucleoFlags from "nucleo-flags"
 import type { IconProps } from "nucleo-flags"
 
@@ -115,4 +115,17 @@ export function getFlagIcon(location: string): FlagComponent | null {
 
   const Icon = FLAG_ICONS[iconName]
   return Icon ?? null
+}
+
+export function renderLocationFlag(
+  location: string,
+  props: IconProps
+): ReactNode {
+  const iconName = resolveLocationFlag(location)
+  if (!iconName) return null
+
+  const Icon = FLAG_ICONS[iconName]
+  if (!Icon) return null
+
+  return createElement(Icon, props)
 }

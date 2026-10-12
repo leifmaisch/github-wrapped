@@ -1,4 +1,4 @@
-import { getFlagIcon } from "@/lib/location-flag"
+import { renderLocationFlag } from "@/lib/location-flag"
 import { cn } from "@/lib/utils"
 
 export function CountryFlag({
@@ -10,15 +10,9 @@ export function CountryFlag({
   className?: string
   size?: number
 }) {
-  const Icon = getFlagIcon(location)
-
-  if (!Icon) return null
-
-  return (
-    <Icon
-      size={size}
-      aria-hidden
-      className={cn("shrink-0 rounded-sm", className)}
-    />
-  )
+  return renderLocationFlag(location, {
+    size,
+    "aria-hidden": true,
+    className: cn("shrink-0 rounded-sm", className),
+  })
 }

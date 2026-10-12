@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useState, useSyncExternalStore } from "react"
 import {
   ArrowRightIcon,
   ArrowSquareOutIcon,
@@ -43,17 +43,21 @@ function formatNumber(value: number) {
   return value.toLocaleString()
 }
 
+function useClientOrigin() {
+  return useSyncExternalStore(
+    () => () => {},
+    () => window.location.origin,
+    () => ""
+  )
+}
+
 function ShareBar({ shareId }: { shareId: string }) {
   const [copied, setCopied] = useState(false)
-  const [shareUrl, setShareUrl] = useState<string | null>(null)
+  const origin = useClientOrigin()
   const sharePath = `/r/${shareId}`
-
-  useEffect(() => {
-    const base =
-      process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
-      window.location.origin
-    setShareUrl(`${base}${sharePath}`)
-  }, [sharePath])
+  const configuredBase = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "")
+  const base = configuredBase || origin || null
+  const shareUrl = base ? `${base}${sharePath}` : null
 
   async function copyLink() {
     const url =
@@ -398,26 +402,40 @@ export function WrapPage() {
   )
 }
 
-export function SharedWrappedPage({ result }: { result: WrappedResult }) {
-  const shareId = result.shareId ?? ""
-  const [phase, setPhase] = useState<"loading" | "story" | "results">("loading")
+function useSharedWrapPhase(shareId: string) {
+  const storedPhase = useSyncExternalStore(
+    () => () => {},
+    () => {
+      if (!shareId) return "results" as const
+      return sessionStorage.getItem(wrapStoryPendingKey(shareId))
+        ? ("story" as const)
+        : ("results" as const)
+    },
+    () => "loading" as const
+  )
 
-  useEffect(() => {
-    if (!shareId) {
-      setPhase("results")
-      return
-    }
+  const [completedStory, setCompletedStory] = useState(false)
 
-    const pending = sessionStorage.getItem(wrapStoryPendingKey(shareId))
-    setPhase(pending ? "story" : "results")
-  }, [shareId])
+  const phase =
+    storedPhase === "loading"
+      ? "loading"
+      : completedStory
+        ? "results"
+        : storedPhase
 
   const completeStory = useCallback(() => {
     if (shareId) {
       sessionStorage.removeItem(wrapStoryPendingKey(shareId))
     }
-    setPhase("results")
+    setCompletedStory(true)
   }, [shareId])
+
+  return { phase, completeStory }
+}
+
+export function SharedWrappedPage({ result }: { result: WrappedResult }) {
+  const shareId = result.shareId ?? ""
+  const { phase, completeStory } = useSharedWrapPhase(shareId)
 
   if (phase === "loading") {
     return <div className="min-h-screen bg-background" aria-hidden />
